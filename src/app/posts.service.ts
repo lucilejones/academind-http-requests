@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, tap } from 'rxjs/operators';
 import { Subject, throwError } from 'rxjs';
 
 import { Post } from './post.model';
@@ -17,7 +17,10 @@ export class PostsService {
         this.http
         .post<{name: string}>(
             'https://academind-http-requests-default-rtdb.firebaseio.com/posts.json',
-            postData
+            postData,
+            {
+                observe: 'response'
+            }
         )
         .subscribe(responseData => {
             console.log(responseData);
@@ -53,6 +56,12 @@ export class PostsService {
     }
 
     deletePosts() {
-        return this.http.delete('https://academind-http-requests-default-rtdb.firebaseio.com/posts.json')
+        return this.http.delete('https://academind-http-requests-default-rtdb.firebaseio.com/posts.json',
+        {
+            observe: 'events'
+        }
+        ).pipe(tap(event => {
+            console.log(event);
+        }))
     }
 }
